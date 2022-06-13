@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import { theme } from "./theme";
 import { RecoilRoot } from "recoil";
-import { ThemeProvider } from "styled-components";
+import { createGlobalStyle, ThemeProvider } from "styled-components";
 
 const GlobalStyle = createGlobalStyle`
 @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400&display=swap');
@@ -76,9 +76,8 @@ const root = ReactDOM.createRoot(
 root.render(
   <RecoilRoot>
     <ThemeProvider theme={theme}>
-      <GlobalStyle>
+      <GlobalStyle/>
       <App />
-      </GlobalStyle>
     </ThemeProvider>
   </RecoilRoot>  
 );
