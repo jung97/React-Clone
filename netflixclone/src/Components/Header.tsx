@@ -1,7 +1,8 @@
-import { Link, useRouteMatch } from "react-router-dom";
+import { Link, useRouteMatch, useHistory } from "react-router-dom";
 import styled from "styled-components";
 import { motion, useAnimation, useViewportScroll } from "framer-motion";
 import { useState , useEffect } from 'react';
+import { useForm } from 'react-hook-form';
 const Nav = styled(motion.nav)`
   display: flex;
   justify-content: space-between;
@@ -44,7 +45,7 @@ const Item = styled.li`
     color: ${(props) => props.theme.white.lighter};
   }
 `;
-const Search = styled.span`
+const Search = styled.form`
   display: flex;
   align-items: center;
   position: relative;
@@ -53,7 +54,6 @@ const Search = styled.span`
     height: 25px;
   }
 `;
-
 const Circle = styled(motion.span)`
   position: absolute;
   width: 5px;
@@ -65,6 +65,7 @@ const Circle = styled(motion.span)`
   margin: 0 auto;
   background-color: ${(props) => props.theme.red};
 `;
+
 
 const logoVariants = {
   normal: {
@@ -100,6 +101,10 @@ const navBariants = {
   },
 };
 
+interface IForm {
+  keyword: string;
+}
+
 function Header() {
   const [searchOpen, setSerchOpen] = useState(false);
   const homeMatch = useRouteMatch("/");
@@ -125,6 +130,12 @@ function Header() {
     });
   },
   [scrollY,navAnimation]);
+  const history = useHistory();
+  const {register, handleSubmit} = useForm<IForm>();
+  const onValid = (data: IForm) => {
+    history.push(`/search?keyword=${data.keyword}`);
+  };
+
   return (
     <Nav variants={navBariants} animate={navAnimation} initial={"top"}>
       <Col>
@@ -144,17 +155,14 @@ function Header() {
             <Link to="/">
               Home {homeMatch?.isExact && <Circle layoutId="circle" />}
             </Link>
-          </Item>
-          
-          <Item>
+            </Item>
             <Link to="/tv">
               Tv Shows {tvMatch && <Circle layoutId="circle" />}
             </Link>
-          </Item>
         </Items>
       </Col>
       <Col>
-        <Search>
+        <Search onSubmit={handleSubmit(onValid)}>
           <motion.svg
             onClick={toggleSearch}
             animate={{x:searchOpen ? -185: 0}}
@@ -170,6 +178,7 @@ function Header() {
             ></path>
           </motion.svg>
           <Input
+          {...register("keyword", {required: true, minLength: 2})}
           transition={{type:"linear"}}
           animate={inputAnimation}
           initial={{scaleX:0}}
